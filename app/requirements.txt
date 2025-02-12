@@ -1,0 +1,12 @@
+langchain_openai
+langchain_experimental
+langchain_community
+matplotlib
+openai==1.56.1
+pandas
+plotly.express
+psycopg2-binary
+pydantic==1.9.0
+scikit-learn
+sqlalchemy
+streamlit
