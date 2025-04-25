@@ -1,7 +1,10 @@
 import streamlit as st
+from sidebar import render_sidebar
+
+render_sidebar()
 
 # Streamlitのページ設定
-st.set_page_config(page_title="色作り", layout="centered")
+st.title("いろ作り")
 
 # スライダーでRGB値を取得
 r = st.slider('赤 (R)', 0, 255, 0)

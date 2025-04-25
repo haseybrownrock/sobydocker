@@ -1,5 +1,8 @@
 import streamlit as st
 from openai import OpenAI
+from sidebar import render_sidebar
+
+render_sidebar()
 
 client = OpenAI()
 

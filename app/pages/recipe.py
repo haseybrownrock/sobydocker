@@ -5,7 +5,9 @@ from pydantic import BaseModel, Field
 import io
 import os
 from PIL import Image
+from sidebar import render_sidebar
 
+render_sidebar()
 
 class Ingredient(BaseModel):
     ingredient: str = Field(description="材料", examples=["鶏もも肉"])

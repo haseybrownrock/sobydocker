@@ -1,9 +1,6 @@
 import streamlit as st
+from sidebar import render_sidebar
 
-import psycopg2
-import os
-import sys
+render_sidebar()
 
 st.title("そびー環境Docker版")
-
-

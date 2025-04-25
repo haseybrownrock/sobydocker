@@ -1,6 +1,9 @@
 import streamlit as st
 from openai import OpenAI
 import os
+from sidebar import render_sidebar
+
+render_sidebar()
 
 # OpenAIクライアントの初期化
 client = OpenAI()
@@ -16,28 +19,31 @@ if "audio_file_path" not in st.session_state:
     st.session_state["audio_file_path"] = None  # 音声ファイルパスの初期化
 if "show_story" not in st.session_state:
     st.session_state["show_story"] = False  # お話を表示するフラグ
-if "show_illustrate" not in st.session_state:
-    st.session_state["show_illustrate"] = False  # イラストを表示するフラグ
-if "illustration_url" not in st.session_state:
-    st.session_state["illustration_url"] = None  # イラストのURL
-if "illustrate_generated" not in st.session_state:
-    st.session_state["illustrate_generated"] = False  # イラスト生成フラグ
 
-st.title("おはなしのつづき")
+st.title("さんだいばなし")
+st.write("さんだいばなし（三題噺)とは、落語家さんがおきゃくさんから三つのお題をもらい、それを元にその場でお話を作るものです。お話は「だれが」「なにを」「どこで」を含むようにするのがお作法です。")
 
 # ユーザー入力
-user_message = st.text_input(label="おはなしのつづきを考えてくれるよ")
+who_message = st.text_input(label="だれが")
+where_message = st.text_input(label="どこで")
+what_message = st.text_input(label="何を使って")
+
+ending_options = ["みんなから感謝される", "いやな思いをする", "楽しい思いをする"]
+# selected_ending = st.selectbox("どうなる", ending_options)
+
 
 # お話生成ボタン
-if st.button("おはなしを生成する") and user_message:
+if st.button("おはなしを生成する") and who_message:
     with st.spinner('お話を生成中...'):
         # ChatGPT APIでお話を生成
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "お話の続きを考えてください。200文字ぐらいです。笑える感じも欲しいです"},
+                {"role": "system", "content": "文字数は400文字ぐらいです。"},
                 {"role": "system", "content": "冒険する話以外でお願いします。"},
-                {"role": "user", "content": user_message},
+                {"role": "user", "content": f"{who_message}が{where_message}という場所で{what_message}を使って何かをするお話を考えてください。"},
+                {"role": "system", "content": f"{who_message},{where_message},{what_message}の特徴を必ず活かしてください"},
+                 {"role": "system", "content": f"最後、{who_message}はみんなから喜ばれるような展開にしてください。"},
             ]
         )
         st.session_state["ai_text"] = completion.choices[0].message.content
@@ -63,20 +69,8 @@ if st.session_state["ready_to_display"] and st.session_state["ai_text"]:
             st.session_state["audio_file_path"] = audio_file_path
             st.session_state["audio_generated"] = True
 
-        # 音声ファイルの生成
-    if not st.session_state["illustrate_generated"]:
-        with st.spinner('イラストを生成中...'):
-            dalle_response = client.images.generate(
-                    model="dall-e-2",
-                    prompt=st.session_state["ai_text"],
-                    n=1,
-                    size="256x256"
-                )
-            st.session_state["illustration_url"] = dalle_response.data[0].url
-            st.session_state["illustrate_generated"] = True
-
     # 再生ボタンを追加
-    if st.session_state["illustrate_generated"]:
+    if st.session_state["audio_generated"]:
         st.write("おはなしができたよ!")
         # Streamlitのオーディオプレーヤーを利用
         st.audio(st.session_state["audio_file_path"], format="audio/mp3", start_time=0)
@@ -84,13 +78,6 @@ if st.session_state["ready_to_display"] and st.session_state["ai_text"]:
         # お話を表示するボタン
         if st.button("お話を表示する"):
             st.session_state["show_story"] = True
-        
-        # イラストを表示するボタン
-        if st.button("イラストを表示する"):
-            st.session_state["show_illustrate"] = True
-
-
-
 
 # お話を表示
 if st.session_state["show_story"]:
@@ -98,13 +85,4 @@ if st.session_state["show_story"]:
     # 閉じるボタン
     if st.button("閉じる"):
         st.session_state["show_story"] = False
-        st.experimental_rerun()  # セッション状態を即座に反映するためにリロード
-
-# イラストを表示
-
-if st.session_state["show_illustrate"]:
-    st.image(st.session_state["illustration_url"], use_column_width=True)
-    # 閉じるボタン
-    if st.button("閉じる"):
-        st.session_state["show_illusrate"] = False
         st.experimental_rerun()  # セッション状態を即座に反映するためにリロード

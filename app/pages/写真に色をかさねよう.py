@@ -1,5 +1,8 @@
-import streamlit as st
+どimport streamlit as st
 from PIL import Image, ImageDraw
+from sidebar import render_sidebar
+
+render_sidebar()
 
 # Streamlitのページ設定
 st.set_page_config(page_title="色作り", layout="centered")
